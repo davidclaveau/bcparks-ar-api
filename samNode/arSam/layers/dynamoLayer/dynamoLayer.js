@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const { logger } = require("./opt/logger");
+const { logger } = require("./opt/loggerLayer");
 
 const TABLE_NAME = process.env.TABLE_NAME || "ar-tests";
 const CONFIG_TABLE_NAME = process.env.CONFIG_TABLE_NAME || "ar-config";

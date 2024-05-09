@@ -1,6 +1,6 @@
 const axios = require("axios");
 //const { mainModule } = require("process"); Never used? 
-const { logger } = require("./opt/logger");
+const { logger } = require("./opt/loggerLayer");
 
 const config = {
   headers: {
