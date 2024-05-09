@@ -4,56 +4,160 @@ Description: >
   arSam
 
   Sample SAM Template for arSam
-
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Parameters:
+ ###ENV VARS GO HERE
+  AWSAccountList:
+      Type: String
+      Default: 'default'
+ 
 Globals:
-  Function:
-    Timeout: 3
+  Api:
+      Cors:
+          AllowMethods: "'POST,GET,OPTIONS, PUT'"
+          AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-App-Version'"
+          AllowOrigin: "'*'"
 
-    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
-    LoggingConfig:
-      LogFormat: JSON
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function
+##LAYERS HERE
+  VarianceLayer:
+    Type: AWS::Serverless::LayerVersion
     Properties:
-      PackageType: Image
-      Architectures:
-      - x86_64
-      Events:
-        HelloWorld:
-          Type: Api
-          Properties:
-            Path: /hello
-            Method: get
+      LayerName: varianceLayer
+      Description: Variance Layer
+      ContentUri: layers/varianceLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
     Metadata:
-      DockerTag: nodejs18.x-v1
-      DockerContext: ./hello-world
-      Dockerfile: Dockerfile
+      BuildMethod: makefile
+  
+  SubAreaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: subAreaLayer
+      Description: SubArea Layer
+      ContentUri: layers/subAreaLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
 
-  ApplicationResourceGroup:
-    Type: AWS::ResourceGroups::Group
+  ResponseLayer:
+    Type: AWS::Serverless::LayerVersion
     Properties:
-      Name:
-        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
-      ResourceQuery:
-        Type: CLOUDFORMATION_STACK_1_0
-  ApplicationInsightsMonitoring:
-    Type: AWS::ApplicationInsights::Application
+      LayerName: responseLayer
+      Description: Response Layer
+      ContentUri: layers/responseLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+  PermissionLayer:
+    Type: AWS::Serverless::LayerVersion
     Properties:
-      ResourceGroupName:
-        Ref: ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
-Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+      LayerName: permissionLayer
+      Description: Permission Layer
+      ContentUri: layers/permissionLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+  LoggerLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: loggerLayer
+      Description: Logger Layer
+      ContentUri: layers/loggerLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+  KeycloakLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: keycloakLayer
+      Description: Keycloak Layer
+      ContentUri: layers/keycloakLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+  FunctionsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: functionsLayer
+      Description: Functions Layer
+      ContentUri: layers/functionsLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+  FormulaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: formulaLayer
+      Description: Formula Layer
+      ContentUri: layers/formulaLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+  DynamoLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: dynamoLayer
+      Description: Dynamo Layer
+      ContentUri: layers/dynamoLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+  ConstantsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: constantsLayer
+      Description: Constants Layer
+      ContentUri: layers/constantsLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
+
+  CaptchaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: captchaLayer
+      Description: Captcha Layer
+      ContentUri: layers/captchaLayer/
+      CompatibleRuntimes:
+        - nodejs18.x
+      LicenseInfo: 'Apache-2.0'
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: makefile
