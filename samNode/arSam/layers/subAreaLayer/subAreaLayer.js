@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const { TABLE_NAME } = require('./opt/dynamoLayer');
+const { TABLE_NAME } = require('/opt/dynamoLayer');
 
 function createUpdateParkWithNewSubAreaObj(subAreaName, subAreaId, isLegacy, orcs) {
   // Return update park obj

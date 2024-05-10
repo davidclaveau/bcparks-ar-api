@@ -6,7 +6,7 @@ const INVALID_TOKEN = {
   decoded: false,
   data: null
 };
-const { logger } = require('./opt/loggerLayer');
+const { logger } = require('/opt/loggerLayer');
 
 exports.decodeJWT = async function (event) {
   const token = event.headers.Authorization;

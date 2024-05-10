@@ -15,7 +15,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY
       alg: 'A256GCM',
       k: 'FK3d8WvSRdxlUHs4Fs_xxYO3-6dCiUarBwiYNFw5hv8'
     };
-const { logger } = require('./opt/loggerLayer');
+const { logger } = require('/opt/loggerLayer');
 
 const AWS_REGION = process.env.AWS_DEFAULT_REGION || 'ca-central-1';
 
