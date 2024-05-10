@@ -1,0 +1,9 @@
+{
+    "name": "cloudwatchAlarmFunction",
+    "version": "1.0.0",
+    "author": "bbbb",
+    "dependencies": {
+		  "axios": "^1.4.0",
+      "luxon": "^3.2.1"
+    }
+  }

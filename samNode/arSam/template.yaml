@@ -6,16 +6,57 @@ Description: >
   Sample SAM Template for arSam
 Parameters:
  ###ENV VARS GO HERE
-  AWSAccountList:
-      Type: String
-      Default: 'default'
+  ### Cloudwatch Alarm
+  # RocketchatURL:
+  #   Type: String
+  #   Default: 'https://rocketchat.com'
+  # RocketchatBearerToken:
+  #   Type: String
+  #   Default: 'defaultToken'
+  # AWSAccountList:
+  #   Type: String
+  #   Default: 'defaultAccount'
+  ### Export
+  IsOffline:
+    Type: String
+    Default: 'false'
+  ExportFunctionName:
+    Type: String
+    Default: 'bcparks-ar-api-api-exportInvokable'
+  ExportExpiryTime:
+    Type: String
+    Default: '30'
+  FilePath:
+    Type: String
+    Default: './'
+  FileNameExport:
+    Type: String
+    Default: 'A&R_Export'
+  FileNameVarianceExport:
+    Type: String
+    Default: 'A&R_Variance_Report'
+  CsvSysadminSchema:
+    Type: String
+    Default: 'defaultSchema'
+  JobUpdateModulo:
+    Type: String
+    Default: 'defaultModulo'
+  DisableProgressUpdates:
+    Type: String
+    Default: 'false'
+  DisableHighAccuracyProgressPercentage:
+    Type: String
+    Default: 'false'
+  S3BucketData:
+    Type: String
+    Default: 'defaultBucket'
  
 Globals:
   Api:
-      Cors:
-          AllowMethods: "'POST,GET,OPTIONS, PUT'"
-          AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-App-Version'"
-          AllowOrigin: "'*'"
+    Cors:
+      AllowMethods: "'POST,GET,OPTIONS, PUT'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-App-Version'"
+      AllowOrigin: "'*'"
 
 Resources:
 ##LAYERS HERE
@@ -161,3 +202,326 @@ Resources:
       RetentionPolicy: Retain
     Metadata:
       BuildMethod: makefile
+
+  ### FUNCTIONS
+
+  ############
+  # Activity #
+  ############
+  ActivityGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: activity/GET/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+          - !Ref LoggerLayer
+          - !Ref PermissionLayer
+          - !Ref ResponseLayer
+          - !Ref DynamoLayer
+      Events:
+        activityGet:
+          Type: Api
+          Properties:
+            Path: /activity
+            Method: get      
+  ActivityPostFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: activity/POST/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+          - !Ref DynamoLayer
+          - !Ref PermissionLayer
+          - !Ref LoggerLayer
+          - !Ref VarianceLayer
+          - !Ref ConstantsLayer
+      Events:
+        activityPost:
+          Type: Api
+          Properties:
+            Path: /activity
+            Method: post
+        activityRecordLock:
+          Type: Api
+          Properties:
+            Path: /activity/lock
+            Method: post
+        activityRecordUnlock:
+          Type: Api
+          Properties:
+            Path: /activity/unlock
+            Method: post
+  ActivityDeleteFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: activity/DELETE/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+          - !Ref LoggerLayer
+      Events:
+        activityDelete:
+          Type: Api
+          Properties:
+            Path: /activity
+            Method: delete
+  ActivityPutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: activity/PUT/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+          - !Ref LoggerLayer
+      Events:
+        activityPut:
+          Type: Api
+          Properties:
+            Path: /activity
+            Method: put
+
+  ####################
+  # Cloudwatch Alarm #
+  ####################
+  # cloudwatchAlarmFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: cloudwatchAlarm/
+  #     Timeout: 60
+  #     Handler: index.handler
+  #     Runtime: nodejs18.x
+  #     Layers:
+  #       - !Ref LoggerLayer
+  #       - !Ref DynamoLayer
+  #     Environment:
+  #       Variables:
+  #         ROCKETCHAT_URL: !Ref RocketchatURL
+  #         ROCKETCHAT_BEARER_TOKEN: !Ref RocketchatBearerToken
+  #         AWS_ACCOUNT_LIST: !Ref AWSAccountList
+  #     Events:
+  #       cloudwatchAlarm:
+  #         Type: Api
+  #         Properties:
+  #           Path: /cloudwatchAlarm
+  #           Method: get
+
+  ##########
+  # Export #
+  ##########
+  ExportGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: export/GET/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Environment:
+        Variables:
+          IS_OFFLINE: !Ref IsOffline
+          EXPORT_FUNCTION_NAME: !Ref ExportFunctionName
+          EXPORT_EXPIRY_TIME: !Ref ExportExpiryTime
+      Layers:
+          - !Ref DynamoLayer
+          - !Ref ResponseLayer
+          - !Ref PermissionLayer
+          - !Ref FunctionsLayer
+          - !Ref LoggerLayer
+      Events:
+        exportGet:
+          Type: Api
+          Properties:
+            Path: /export
+            Method: get
+  ExportInvokableFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: export/invokable/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Environment:
+        Variables:
+          FILE_PATH: !Ref FilePath
+          FILE_NAME: !Ref FileNameExport
+          CSV_SYSADMIN_SCHEMA: !Ref CsvSysadminSchema
+          JOB_UPDATE_MODULO: !Ref JobUpdateModulo
+          DISABLE_PROGRESS_UPDATES: !Ref DisableProgressUpdates
+          DISABLE_HIGH_ACCURACY_PROGRESS_PERCENTAGE: !Ref DisableHighAccuracyProgressPercentage
+          S3_BUCKET_DATA: !Ref S3BucketData
+      Layers:
+          - !Ref LoggerLayer
+          - !Ref DynamoLayer
+          - !Ref FunctionsLayer
+          - !Ref FormulaLayer
+
+  ###################
+  # Export Variance #
+  ###################
+  VarianceExportGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: export-variance/GET/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Environment:
+        Variables:
+          IS_OFFLINE: !Ref IsOffline
+          EXPORT_FUNCTION_NAME: !Ref ExportFunctionName
+          EXPORT_EXPIRY_TIME: !Ref ExportExpiryTime
+          S3_BUCKET_DATA: !Ref S3BucketData
+      Layers:
+          - !Ref LoggerLayer
+          - !Ref PermissionLayer
+          - !Ref ResponseLayer
+          - !Ref DynamoLayer
+      Events:
+        varianceExportGet:
+          Type: Api
+          Properties:
+            Path: /export-variance
+            Method: get
+  VarianceExportInvokableFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: export-variance/invokable/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Environment:
+        Variables:
+          FILE_PATH: !Ref FilePath
+          FILE_NAME: !Ref FileNameVarianceExport
+          IS_OFFLINE: !Ref IsOffline
+          S3_BUCKET_DATA: !Ref S3BucketData
+      Layers:
+          - !Ref LoggerLayer
+          - !Ref ConstantsLayer
+          - !Ref DynamoLayer
+
+  ###################
+  # Fiscal Year End #
+  ###################
+  FiscalYearEndGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fiscalYearEnd/GET/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+          - !Ref LoggerLayer
+          - !Ref PermissionLayer
+          - !Ref ResponseLayer
+          - !Ref DynamoLayer
+      Events:
+        fiscalYearEndGet:
+          Type: Api
+          Properties:
+            Path: /fiscalYearEnd
+            Method: get
+  FiscalYearEndPostFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fiscalYearEnd/POST/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+          - !Ref DynamoLayer
+          - !Ref ResponseLayer
+          - !Ref LoggerLayer
+          - !Ref PermissionLayer
+      Events:
+        fiscalYearEndLock:
+          Type: Api
+          Properties:
+            Path: /fiscalYearEnd/lock
+            Method: post
+        fiscalYearEndUnlock:
+          Type: Api
+          Properties:
+            Path: /fiscalYearEnd/unlock
+            Method: post
+
+  ########
+  # Park #
+  ########
+  ParkGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: park/GET/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref DynamoLayer
+        - !Ref ResponseLayer
+        - !Ref PermissionLayer
+        - !Ref LoggerLayer
+      Events:
+        parkGet:
+          Type: Api
+          Properties:
+            Path: /park
+            Method: get
+  ParkPostFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: park/POST/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref DynamoLayer
+        - !Ref PermissionLayer
+        - !Ref ResponseLayer
+        - !Ref LoggerLayer
+      Events:
+        fiscalYearEndLock:
+          Type: Api
+          Properties:
+            Path: /park
+            Method: post
+  ParkPutFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: park/PUT/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref LoggerLayer
+      Events:
+        fiscalYearEndLock:
+          Type: Api
+          Properties:
+            Path: /park
+            Method: put
+
+  ###############
+  # Read Config #
+  ###############
+  ReadConfigFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: readConfig/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref DynamoLayer
+        - !Ref ResponseLayer
+        - !Ref LoggerLayer
+      Events:
+        readConfig:
+          Type: Api
+          Properties:
+            Path: /readConfig
+            Method: get
