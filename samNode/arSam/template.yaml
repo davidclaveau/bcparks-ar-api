@@ -292,7 +292,7 @@ Resources:
           LOG_LEVEL: !Ref LogLevel
       CodeUri: activity/POST/
       Timeout: 60
-      Handler: index.handler
+      Handler: index.handlePost
       Runtime: nodejs18.x
       Layers:
           - !Ref DynamoLayer
@@ -306,11 +306,67 @@ Resources:
           Properties:
             Path: /activity
             Method: post
+
+  ActivityPostLockFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          JWT_SECRET: !Ref JwtSecret
+          JWT_SIGN_EXPIRY: !Ref JwtSignExpiry
+          CAPTCHA_SIGN_EXPIRY: !Ref CaptchaSignExpiry
+          PRIVATE_KEY: !Ref PrivateKey
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
+      CodeUri: activity/POST/
+      Timeout: 60
+      Handler: index.handleLock
+      Runtime: nodejs18.x
+      Layers:
+          - !Ref DynamoLayer
+          - !Ref PermissionLayer
+          - !Ref LoggerLayer
+          - !Ref VarianceLayer
+          - !Ref ConstantsLayer
+      Events:
         activityRecordLock:
           Type: Api
           Properties:
             Path: /activity/lock
             Method: post
+    
+  ActivityPostUnlockFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          JWT_SECRET: !Ref JwtSecret
+          JWT_SIGN_EXPIRY: !Ref JwtSignExpiry
+          CAPTCHA_SIGN_EXPIRY: !Ref CaptchaSignExpiry
+          PRIVATE_KEY: !Ref PrivateKey
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
+      CodeUri: activity/POST/
+      Timeout: 60
+      Handler: index.handleUnlock
+      Runtime: nodejs18.x
+      Layers:
+          - !Ref DynamoLayer
+          - !Ref PermissionLayer
+          - !Ref LoggerLayer
+          - !Ref VarianceLayer
+          - !Ref ConstantsLayer
+      Events:
         activityRecordUnlock:
           Type: Api
           Properties:
@@ -531,7 +587,7 @@ Resources:
             Path: /fiscalYearEnd
             Method: get
 
-  FiscalYearEndPostFunction:
+  FiscalYearEndPostLockFunction:
     Type: AWS::Serverless::Function
     Properties:
       Environment:
@@ -545,7 +601,7 @@ Resources:
           LOG_LEVEL: !Ref LogLevel
       CodeUri: fiscalYearEnd/POST/
       Timeout: 60
-      Handler: index.handler
+      Handler: index.lockFiscalYear
       Runtime: nodejs18.x
       Layers:
           - !Ref DynamoLayer
@@ -558,6 +614,29 @@ Resources:
           Properties:
             Path: /fiscalYearEnd/lock
             Method: post
+
+  FiscalYearEndPostUnlockFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
+      CodeUri: fiscalYearEnd/POST/
+      Timeout: 60
+      Handler: index.unlockFiscalYear
+      Runtime: nodejs18.x
+      Layers:
+          - !Ref DynamoLayer
+          - !Ref ResponseLayer
+          - !Ref LoggerLayer
+          - !Ref PermissionLayer
+      Events:
         fiscalYearEndUnlock:
           Type: Api
           Properties:
