@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const jwksClient = require('jwks-rsa');
+const jwksClient = require('jwks-rsa'); 
 const SSO_ISSUER = process.env.SSO_ISSUER || 'https://dev.loginproxy.gov.bc.ca/auth/realms/bcparks-service-transformation';
 const SSO_JWKSURI = process.env.SSO_JWKSURI || 'https://dev.loginproxy.gov.bc.ca/auth/realms/bcparks-service-transformation/protocol/openid-connect/certs';
 const INVALID_TOKEN = {

@@ -3,13 +3,16 @@ const { logger } = require("/opt/loggerLayer");
 
 const TABLE_NAME = process.env.TABLE_NAME || "ar-tests";
 const CONFIG_TABLE_NAME = process.env.CONFIG_TABLE_NAME || "ar-config";
+const AWS_REGION = process.env.AWS_REGION || "ca-central-1"
 const options = {
-  region: "ca-central-1",
+  region: AWS_REGION,
+  endpoint: "http://172.17.0.2:8000"
 };
-
-if (process.env.IS_OFFLINE) {
-  options.endpoint = "http://localhost:8000";
+if (process.env.IS_OFFLINE === 'true') {
+  // Env vars evaluate as strings
+  options.endpoint = process.env.DYNAMODB_ENDPOINT_URL || 'http://127.0.0.2:8000';
 }
+
 const ACTIVE_STATUS = "active";
 const RESERVED_STATUS = "reserved";
 const EXPIRED_STATUS = "expired";
@@ -40,6 +43,7 @@ const dynamodb = new AWS.DynamoDB(options);
 
 exports.dynamodb = new AWS.DynamoDB();
 
+console.log("Dynamo logged here: ", dynamodb)
 // simple way to return a single Item by primary key.
 async function getOne(pk, sk) {
   logger.debug(`getItem: { pk: ${pk}, sk: ${sk} }`);
