@@ -17,7 +17,7 @@ exports.handler = async (event, context) => {
 
   try {
     const token = await decodeJWT(event);
-    const permissionObject = resolvePermissions(token);
+    const permissionObject = resolvePermissions(token); 
 
     if (!permissionObject.isAuthenticated) {
       logger.info("**NOT AUTHENTICATED, PUBLIC**");

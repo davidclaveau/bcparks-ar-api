@@ -5,21 +5,19 @@ Description: >
 
   Sample SAM Template for arSam
 Parameters:
+
  ###ENV VARS GO HERE
   ### Cloudwatch Alarm
-  # RocketchatURL:
-  #   Type: String
-  #   Default: 'https://rocketchat.com'
-  # RocketchatBearerToken:
-  #   Type: String
-  #   Default: 'defaultToken'
-  # AWSAccountList:
-  #   Type: String
-  #   Default: 'defaultAccount'
-  ### Export
-  IsOffline:
-    Type: String
-    Default: 'false'
+  #RocketchatURL:
+  #  Type: String
+  #  Default: 'https://rocketchat.com'
+  #RocketchatBearerToken:
+  #  Type: String
+  #  Default: 'defaultToken'
+  #AWSAccountList:
+  #  Type: String
+  #  Default: 'defaultAccount'
+  ## Export
   ExportFunctionName:
     Type: String
     Default: 'bcparks-ar-api-api-exportInvokable'
@@ -49,7 +47,43 @@ Parameters:
     Default: 'false'
   S3BucketData:
     Type: String
-    Default: 'defaultBucket'
+    Default: 'defaultBucket' 
+  TableName:
+    Type: String
+    Default: 'ar-tests'
+  IsOffline: 
+    Type: String
+    Default: "true"
+  AWSRegion:
+    Type: String
+    Default: "ca-central-1"
+  DynamoDBEndpointURL: 
+    Type: String
+    Default: "http://172.0.0.2:8000"
+  ConfigTableName: 
+    Type: String
+    Default: "ar-config"
+  JwtSecret: 
+    Type: String 
+    Default: "defaultSecret"
+  JwtSignExpiry: 
+    Type: String
+    Default: "5"
+  CaptchaSignExpiry: 
+    Type: String
+    Default: "30"
+  PrivateKey: 
+    Type: String
+    Default: ""
+  SSOIssuer: 
+    Type: String
+    Default: "https://dev.loginproxy.gov.bc.ca/auth/realms/bcparks-service-transformation"
+  SSOJwksuri: 
+    Type: String
+    Default: "https://dev.loginproxy.gov.bc.ca/auth/realms/bcparks-service-transformation/protocol/openid-connect/certs"
+  LogLevel: 
+    Type: String
+    Default: "error"
  
 Globals:
   Api:
@@ -211,6 +245,19 @@ Resources:
   ActivityGetFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          JWT_SECRET: !Ref JwtSecret
+          JWT_SIGN_EXPIRY: !Ref JwtSignExpiry
+          CAPTCHA_SIGN_EXPIRY: !Ref CaptchaSignExpiry
+          PRIVATE_KEY: !Ref PrivateKey
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
       CodeUri: activity/GET/
       Timeout: 60
       Handler: index.handler
@@ -225,10 +272,24 @@ Resources:
           Type: Api
           Properties:
             Path: /activity
-            Method: get      
+            Method: get
+
   ActivityPostFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          JWT_SECRET: !Ref JwtSecret
+          JWT_SIGN_EXPIRY: !Ref JwtSignExpiry
+          CAPTCHA_SIGN_EXPIRY: !Ref CaptchaSignExpiry
+          PRIVATE_KEY: !Ref PrivateKey
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
       CodeUri: activity/POST/
       Timeout: 60
       Handler: index.handler
@@ -255,9 +316,13 @@ Resources:
           Properties:
             Path: /activity/unlock
             Method: post
+
   ActivityDeleteFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
       CodeUri: activity/DELETE/
       Timeout: 60
       Handler: index.handler
@@ -270,9 +335,13 @@ Resources:
           Properties:
             Path: /activity
             Method: delete
+
   ActivityPutFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
       CodeUri: activity/PUT/
       Timeout: 60
       Handler: index.handler
@@ -323,6 +392,13 @@ Resources:
       Runtime: nodejs18.x
       Environment:
         Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_TABLE: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
           IS_OFFLINE: !Ref IsOffline
           EXPORT_FUNCTION_NAME: !Ref ExportFunctionName
           EXPORT_EXPIRY_TIME: !Ref ExportExpiryTime
@@ -338,6 +414,7 @@ Resources:
           Properties:
             Path: /export
             Method: get
+
   ExportInvokableFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -354,6 +431,11 @@ Resources:
           DISABLE_PROGRESS_UPDATES: !Ref DisableProgressUpdates
           DISABLE_HIGH_ACCURACY_PROGRESS_PERCENTAGE: !Ref DisableHighAccuracyProgressPercentage
           S3_BUCKET_DATA: !Ref S3BucketData
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          LOG_LEVEL: !Ref LogLevel
       Layers:
           - !Ref LoggerLayer
           - !Ref DynamoLayer
@@ -372,10 +454,17 @@ Resources:
       Runtime: nodejs18.x
       Environment:
         Variables:
-          IS_OFFLINE: !Ref IsOffline
-          EXPORT_FUNCTION_NAME: !Ref ExportFunctionName
-          EXPORT_EXPIRY_TIME: !Ref ExportExpiryTime
-          S3_BUCKET_DATA: !Ref S3BucketData
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          JWT_SECRET: !Ref JwtSecret
+          JWT_SIGN_EXPIRY: !Ref JwtSignExpiry
+          CAPTCHA_SIGN_EXPIRY: !Ref CaptchaSignExpiry
+          PRIVATE_KEY: !Ref PrivateKey
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
       Layers:
           - !Ref LoggerLayer
           - !Ref PermissionLayer
@@ -387,6 +476,7 @@ Resources:
           Properties:
             Path: /export-variance
             Method: get
+
   VarianceExportInvokableFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -400,6 +490,11 @@ Resources:
           FILE_NAME: !Ref FileNameVarianceExport
           IS_OFFLINE: !Ref IsOffline
           S3_BUCKET_DATA: !Ref S3BucketData
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          LOG_LEVEL: !Ref LogLevel
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
       Layers:
           - !Ref LoggerLayer
           - !Ref ConstantsLayer
@@ -411,6 +506,15 @@ Resources:
   FiscalYearEndGetFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
       CodeUri: fiscalYearEnd/GET/
       Timeout: 60
       Handler: index.handler
@@ -426,9 +530,19 @@ Resources:
           Properties:
             Path: /fiscalYearEnd
             Method: get
+
   FiscalYearEndPostFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
       CodeUri: fiscalYearEnd/POST/
       Timeout: 60
       Handler: index.handler
@@ -456,6 +570,19 @@ Resources:
   ParkGetFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          JWT_SECRET: !Ref JwtSecret
+          JWT_SIGN_EXPIRY: !Ref JwtSignExpiry
+          CAPTCHA_SIGN_EXPIRY: !Ref CaptchaSignExpiry
+          PRIVATE_KEY: !Ref PrivateKey
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOG_LEVEL: !Ref LogLevel
       CodeUri: park/GET/
       Timeout: 60
       Handler: index.handler
@@ -471,9 +598,19 @@ Resources:
           Properties:
             Path: /park
             Method: get
+
   ParkPostFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          LOC_LEVEL: !Ref LogLevel
       CodeUri: park/POST/
       Timeout: 60
       Handler: index.handler
@@ -489,9 +626,13 @@ Resources:
           Properties:
             Path: /park
             Method: post
+
   ParkPutFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
       CodeUri: park/PUT/
       Timeout: 60
       Handler: index.handler
@@ -511,6 +652,13 @@ Resources:
   ReadConfigFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
       CodeUri: readConfig/
       Timeout: 60
       Handler: index.handler
