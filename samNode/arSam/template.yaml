@@ -752,3 +752,177 @@ Resources:
           Properties:
             Path: /readConfig
             Method: get
+
+
+  #######################
+  # Sub Areas Functions #
+  ####################
+  GetSubAreaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+      CodeUri: subArea/GET/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref LoggerLayer
+      Events:
+        getSubArea:
+          Type: Api
+          Properties:
+            Path: /subArea
+            Method: get
+
+  DeleteSubAreaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+      CodeUri: subArea/DELETE/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref LoggerLayer
+        - !Ref ResponseLayer
+        - !Ref PermissionLayer
+        - !Ref DynamoLayer 
+      Events:
+        deleteSubArea:
+          Type: Api
+          Properties:
+            Path: /subArea
+            Method: delete
+
+  PostSubAreaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+      CodeUri: subArea/POST/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref LoggerLayer
+      Events:
+        readConfig:
+          Type: Api
+          Properties:
+            Path: /subArea
+            Method: post
+
+  PutSubAreaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+      CodeUri: subArea/PUT/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref LoggerLayer
+        - !Ref ResponseLayer
+        - !Ref PermissionLayer
+        - !Ref DynamoLayer 
+      Events:
+        deleteSubArea:
+          Type: Api
+          Properties:
+            Path: /subArea
+            Method: put
+
+
+  
+  ######################
+  # Variance Functions #
+  ######################       
+  GetVarianceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri 
+      CodeUri: variance/GET/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref LoggerLayer
+        - !Ref ResponseLayer
+        - !Ref PermissionLayer
+        - !Ref DynamoLayer 
+      Events:
+        getVariance:
+          Type: Api
+          Properties:
+            Path: /variance
+            Method: get
+  
+  PostVarianceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+      CodeUri: variance/POST/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref LoggerLayer
+      Events:
+        postVariance:
+          Type: Api
+          Properties:
+            Path: /variance
+            Method: post
+
+  PutVarianceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+      CodeUri: variance/POST/
+      Timeout: 60
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Layers:
+        - !Ref LoggerLayer
+        - !Ref ResponseLayer
+        - !Ref PermissionLayer
+        - !Ref DynamoLayer 
+      Events:
+        postVariance:
+          Type: Api
+          Properties:
+            Path: /variance
+            Method: put
