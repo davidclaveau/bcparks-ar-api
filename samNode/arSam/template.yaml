@@ -296,6 +296,7 @@ Resources:
       Runtime: nodejs18.x
       Layers:
           - !Ref DynamoLayer
+          - !Ref ResponseLayer
           - !Ref PermissionLayer
           - !Ref LoggerLayer
           - !Ref VarianceLayer
@@ -329,6 +330,7 @@ Resources:
       Runtime: nodejs18.x
       Layers:
           - !Ref DynamoLayer
+          - !Ref ResponseLayer
           - !Ref PermissionLayer
           - !Ref LoggerLayer
           - !Ref VarianceLayer
@@ -362,6 +364,7 @@ Resources:
       Runtime: nodejs18.x
       Layers:
           - !Ref DynamoLayer
+          - !Ref ResponseLayer
           - !Ref PermissionLayer
           - !Ref LoggerLayer
           - !Ref VarianceLayer
@@ -493,9 +496,10 @@ Resources:
           DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
           LOG_LEVEL: !Ref LogLevel
       Layers:
-          - !Ref LoggerLayer
           - !Ref DynamoLayer
+          - !Ref ConstantsLayer
           - !Ref FunctionsLayer
+          - !Ref LoggerLayer
           - !Ref FormulaLayer
 
   ###################
@@ -846,8 +850,6 @@ Resources:
           Properties:
             Path: /subArea
             Method: put
-
-
   
   ######################
   # Variance Functions #
