@@ -59,7 +59,7 @@ Parameters:
     Default: "ca-central-1"
   DynamoDBEndpointURL: 
     Type: String
-    Default: "http://172.0.0.2:8000"
+    Default: "http://172.17.0.26:8000"
   ConfigTableName: 
     Type: String
     Default: "ar-config"
@@ -120,18 +120,18 @@ Resources:
     Metadata:
       BuildMethod: makefile
 
-  ResponseLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: responseLayer
-      Description: Response Layer
-      ContentUri: layers/responseLayer/
-      CompatibleRuntimes:
-        - nodejs18.x
-      LicenseInfo: 'Apache-2.0'
-      RetentionPolicy: Retain
-    Metadata:
-      BuildMethod: makefile
+  # ResponseLayer:
+  #   Type: AWS::Serverless::LayerVersion
+  #   Properties:
+  #     LayerName: responseLayer
+  #     Description: Response Layer
+  #     ContentUri: layers/responseLayer/
+  #     CompatibleRuntimes:
+  #       - nodejs18.x
+  #     LicenseInfo: 'Apache-2.0'
+  #     RetentionPolicy: Retain
+  #   Metadata:
+  #     BuildMethod: makefile
 
   PermissionLayer:
     Type: AWS::Serverless::LayerVersion
@@ -146,18 +146,31 @@ Resources:
     Metadata:
       BuildMethod: makefile
 
-  LoggerLayer:
+  BaseLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: loggerLayer
-      Description: Logger Layer
-      ContentUri: layers/loggerLayer/
+      LayerName: baseLayer
+      Description: Base Layer
+      ContentUri: layers/baseLayer/
       CompatibleRuntimes:
         - nodejs18.x
       LicenseInfo: 'Apache-2.0'
       RetentionPolicy: Retain
     Metadata:
       BuildMethod: makefile
+
+  # LoggerLayer:
+  #   Type: AWS::Serverless::LayerVersion
+  #   Properties:
+  #     LayerName: loggerLayer
+  #     Description: Logger Layer
+  #     ContentUri: layers/loggerLayer/
+  #     CompatibleRuntimes:
+  #       - nodejs18.x
+  #     LicenseInfo: 'Apache-2.0'
+  #     RetentionPolicy: Retain
+  #   Metadata:
+  #     BuildMethod: makefile
 
   KeycloakLayer:
     Type: AWS::Serverless::LayerVersion
@@ -198,18 +211,18 @@ Resources:
     Metadata:
       BuildMethod: makefile
 
-  DynamoLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: dynamoLayer
-      Description: Dynamo Layer
-      ContentUri: layers/dynamoLayer/
-      CompatibleRuntimes:
-        - nodejs18.x
-      LicenseInfo: 'Apache-2.0'
-      RetentionPolicy: Retain
-    Metadata:
-      BuildMethod: makefile
+  # DynamoLayer:
+  #   Type: AWS::Serverless::LayerVersion
+  #   Properties:
+  #     LayerName: dynamoLayer
+  #     Description: Dynamo Layer
+  #     ContentUri: layers/dynamoLayer/
+  #     CompatibleRuntimes:
+  #       - nodejs18.x
+  #     LicenseInfo: 'Apache-2.0'
+  #     RetentionPolicy: Retain
+  #   Metadata:
+  #     BuildMethod: makefile
 
   ConstantsLayer:
     Type: AWS::Serverless::LayerVersion
@@ -263,10 +276,8 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref PermissionLayer
-          - !Ref ResponseLayer
-          - !Ref DynamoLayer
       Events:
         activityGet:
           Type: Api
@@ -295,10 +306,8 @@ Resources:
       Handler: index.handlePost
       Runtime: nodejs18.x
       Layers:
-          - !Ref DynamoLayer
-          - !Ref ResponseLayer
           - !Ref PermissionLayer
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref VarianceLayer
           - !Ref ConstantsLayer
       Events:
@@ -329,10 +338,8 @@ Resources:
       Handler: index.handleLock
       Runtime: nodejs18.x
       Layers:
-          - !Ref DynamoLayer
-          - !Ref ResponseLayer
           - !Ref PermissionLayer
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref VarianceLayer
           - !Ref ConstantsLayer
       Events:
@@ -363,10 +370,8 @@ Resources:
       Handler: index.handleUnlock
       Runtime: nodejs18.x
       Layers:
-          - !Ref DynamoLayer
-          - !Ref ResponseLayer
           - !Ref PermissionLayer
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref VarianceLayer
           - !Ref ConstantsLayer
       Events:
@@ -387,7 +392,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
       Events:
         activityDelete:
           Type: Api
@@ -406,7 +411,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
       Events:
         activityPut:
           Type: Api
@@ -462,11 +467,9 @@ Resources:
           EXPORT_FUNCTION_NAME: !Ref ExportFunctionName
           EXPORT_EXPIRY_TIME: !Ref ExportExpiryTime
       Layers:
-          - !Ref DynamoLayer
-          - !Ref ResponseLayer
           - !Ref PermissionLayer
           - !Ref FunctionsLayer
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
       Events:
         exportGet:
           Type: Api
@@ -496,10 +499,9 @@ Resources:
           DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
           LOG_LEVEL: !Ref LogLevel
       Layers:
-          - !Ref DynamoLayer
           - !Ref ConstantsLayer
           - !Ref FunctionsLayer
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref FormulaLayer
 
   ###################
@@ -526,10 +528,8 @@ Resources:
           SSO_JWKSURI: !Ref SSOJwksuri
           LOG_LEVEL: !Ref LogLevel
       Layers:
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref PermissionLayer
-          - !Ref ResponseLayer
-          - !Ref DynamoLayer
       Events:
         varianceExportGet:
           Type: Api
@@ -556,9 +556,8 @@ Resources:
           LOG_LEVEL: !Ref LogLevel
           DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
       Layers:
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref ConstantsLayer
-          - !Ref DynamoLayer
 
   ###################
   # Fiscal Year End #
@@ -580,10 +579,8 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref PermissionLayer
-          - !Ref ResponseLayer
-          - !Ref DynamoLayer
       Events:
         fiscalYearEndGet:
           Type: Api
@@ -608,9 +605,7 @@ Resources:
       Handler: index.lockFiscalYear
       Runtime: nodejs18.x
       Layers:
-          - !Ref DynamoLayer
-          - !Ref ResponseLayer
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref PermissionLayer
       Events:
         fiscalYearEndLock:
@@ -636,9 +631,7 @@ Resources:
       Handler: index.unlockFiscalYear
       Runtime: nodejs18.x
       Layers:
-          - !Ref DynamoLayer
-          - !Ref ResponseLayer
-          - !Ref LoggerLayer
+          - !Ref BaseLayer
           - !Ref PermissionLayer
       Events:
         fiscalYearEndUnlock:
@@ -671,10 +664,8 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref DynamoLayer
-        - !Ref ResponseLayer
         - !Ref PermissionLayer
-        - !Ref LoggerLayer
+        - !Ref BaseLayer
       Events:
         parkGet:
           Type: Api
@@ -699,10 +690,8 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref DynamoLayer
         - !Ref PermissionLayer
-        - !Ref ResponseLayer
-        - !Ref LoggerLayer
+        - !Ref BaseLayer
       Events:
         fiscalYearEndLock:
           Type: Api
@@ -721,7 +710,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref LoggerLayer
+        - !Ref BaseLayer
       Events:
         fiscalYearEndLock:
           Type: Api
@@ -747,9 +736,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref DynamoLayer
-        - !Ref ResponseLayer
-        - !Ref LoggerLayer
+        - !Ref BaseLayer
       Events:
         readConfig:
           Type: Api
@@ -772,7 +759,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref LoggerLayer
+        - !Ref BaseLayer
       Events:
         getSubArea:
           Type: Api
@@ -789,16 +776,16 @@ Resources:
           TABLE_NAME: !Ref TableName
           CONFIG_TABLE_NAME: !Ref ConfigTableName
           AWS_REGION: !Ref AWSRegion
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
           DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
       CodeUri: subArea/DELETE/
       Timeout: 60
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref LoggerLayer
-        - !Ref ResponseLayer
+        - !Ref BaseLayer
         - !Ref PermissionLayer
-        - !Ref DynamoLayer 
       Events:
         deleteSubArea:
           Type: Api
@@ -812,12 +799,23 @@ Resources:
       Environment:
         Variables:
           LOG_LEVEL: !Ref LogLevel
+          TABLE_NAME: !Ref TableName
+          CONFIG_TABLE_NAME: !Ref ConfigTableName
+          AWS_REGION: !Ref AWSRegion
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
+          DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
+
       CodeUri: subArea/POST/
       Timeout: 60
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref LoggerLayer
+        - !Ref BaseLayer
+        - !Ref KeycloakLayer
+        - !Ref FormulaLayer
+        - !Ref PermissionLayer
+        - !Ref SubAreaLayer
       Events:
         readConfig:
           Type: Api
@@ -834,16 +832,16 @@ Resources:
           TABLE_NAME: !Ref TableName
           CONFIG_TABLE_NAME: !Ref ConfigTableName
           AWS_REGION: !Ref AWSRegion
+          SSO_ISSUER: !Ref SSOIssuer
+          SSO_JWKSURI: !Ref SSOJwksuri
           DYNAMODB_ENDPOINT_URL: !Ref DynamoDBEndpointURL
       CodeUri: subArea/PUT/
       Timeout: 60
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref LoggerLayer
-        - !Ref ResponseLayer
+        - !Ref BaseLayer
         - !Ref PermissionLayer
-        - !Ref DynamoLayer 
       Events:
         deleteSubArea:
           Type: Api
@@ -871,10 +869,8 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref LoggerLayer
-        - !Ref ResponseLayer
+        - !Ref BaseLayer
         - !Ref PermissionLayer
-        - !Ref DynamoLayer 
       Events:
         getVariance:
           Type: Api
@@ -893,7 +889,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref LoggerLayer
+        - !Ref BaseLayer
       Events:
         postVariance:
           Type: Api
@@ -918,12 +914,10 @@ Resources:
       Handler: index.handler
       Runtime: nodejs18.x
       Layers:
-        - !Ref LoggerLayer
-        - !Ref ResponseLayer
+        - !Ref BaseLayer
         - !Ref PermissionLayer
-        - !Ref DynamoLayer 
       Events:
-        postVariance:
+        putVariance:
           Type: Api
           Properties:
             Path: /variance

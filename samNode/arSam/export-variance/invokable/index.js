@@ -1,9 +1,8 @@
-const { logger } = require("/opt/loggerLayer")
 const AWS = require('aws-sdk');
 const fs = require('fs');
 
 const { VARIANCE_CSV_SCHEMA, VARIANCE_STATE_DICTIONARY } = require("/opt/constantsLayer");
-const { getParks, TABLE_NAME, dynamodb, runQuery } = require("/opt/dynamoLayer");
+const { getParks, TABLE_NAME, dynamodb, runQuery, logger } = require("/opt/baseLayer");
 const s3 = new AWS.S3();
 
 const FILE_PATH = process.env.FILE_PATH || "./";

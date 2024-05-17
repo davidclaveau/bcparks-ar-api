@@ -12,11 +12,10 @@ if (IS_OFFLINE) {
 }
 const lambda = new AWS.Lambda(options);
 
-const { runQuery, dynamodb, TABLE_NAME } = require("/opt/dynamoLayer");
-const { sendResponse } = require("/opt/responseLayer");
+const { runQuery, dynamodb, TABLE_NAME, sendResponse, logger } = require("/opt/baseLayer");
 const { decodeJWT, resolvePermissions } = require("/opt/permissionLayer");
 const { convertRolesToMD5 } = require("/opt/functionsLayer");
-const { logger } = require("/opt/loggerLayer");
+
 
 const EXPORT_FUNCTION_NAME =
   process.env.EXPORT_FUNCTION_NAME || "bcparks-ar-api-api-exportInvokable";

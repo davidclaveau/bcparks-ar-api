@@ -1,8 +1,6 @@
 const AWS = require("aws-sdk");
-const { logger } = require("/opt/loggerLayer");
-const { sendResponse } = require("/opt/responseLayer");
 const { requirePermissions } = require("/opt/permissionLayer");
-const { getOne, TABLE_NAME, dynamodb, runQuery } = require("/opt/dynamoLayer");
+const { getOne, TABLE_NAME, dynamodb, runQuery, sendResponse, logger } = require("/opt/baseLayer");
 
 exports.handler = async (event, context) => {
   logger.info("SubArea delete");

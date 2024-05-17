@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const { logger } = require("/opt/loggerLayer");
+const { logger } = require("/opt/baseLayer");
 
 const TABLE_NAME = process.env.TABLE_NAME || "ar-tests";
 const CONFIG_TABLE_NAME = process.env.CONFIG_TABLE_NAME || "ar-config";
@@ -43,7 +43,7 @@ const dynamodb = new AWS.DynamoDB(options);
 
 exports.dynamodb = new AWS.DynamoDB();
 
-console.log("Dynamo logged here: ", dynamodb)
+logger.info("Dynamo logged here: ", dynamodb)
 // simple way to return a single Item by primary key.
 async function getOne(pk, sk) {
   logger.debug(`getItem: { pk: ${pk}, sk: ${sk} }`);
@@ -211,10 +211,12 @@ async function getRecords(subArea, bundle, section, region, filter = true, inclu
 }
 
 async function incrementAndGetNextSubAreaID() {
+
   const configUpdateObj = {
     TableName: CONFIG_TABLE_NAME,
     Key: {
       pk: { S: "subAreaID" },
+      sk: { S: "lastID"}
     },
     UpdateExpression: "ADD lastID :incrVal",
     ExpressionAttributeValues: {

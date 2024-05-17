@@ -8,7 +8,9 @@ const {
   getParks,
   getSubAreas,
   getRecords,
-} = require("/opt/dynamoLayer");
+  logger,
+  sendResponse
+} = require("/opt/baseLayer");
 const {
   EXPORT_NOTE_KEYS,
   EXPORT_MONTHS,
@@ -16,7 +18,6 @@ const {
   STATE_DICTIONARY,
 } = require("/opt/constantsLayer");
 const { updateJobEntry } = require("/opt/functionsLayer");
-const { logger } = require("/opt/loggerLayer");
 
 const {
   arraySum,

@@ -1,6 +1,6 @@
 // TODO: Decouple subArea get from park get endpoint.
 
-const { logger } = require("/opt/logger");
+const { logger } = require("/opt/baseLayer");
 
 exports.handler = async (event, context) => {
     logger.debug("Subarea get:", event);

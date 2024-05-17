@@ -1,10 +1,9 @@
 const axios = require('axios');
 const { DateTime } = require('luxon');
-const { TIMEZONE } = require('/opt/dynamoLayer');
+const { TIMEZONE, logger } = require('/opt/baseLayer');
 const ROCKETCHAT_URL = process.env.ROCKETCHAT_URL;
 const ROCKETCHAT_BEARER_TOKEN = process.env.ROCKETCHAT_BEARER_TOKEN;
 const AWS_ACCOUNT_LIST = JSON.parse(process.env.AWS_ACCOUNT_LIST);
-const { logger } = require('/opt/loggerLayer');
 
 exports.handler = async (event, context) => {
   logger.debug('Cloudwatch Alarm Event:', event, context);

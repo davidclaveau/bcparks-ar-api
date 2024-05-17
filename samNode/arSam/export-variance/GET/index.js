@@ -13,10 +13,8 @@ if (IS_OFFLINE) {
 
 const lambda = new AWS.Lambda(options);
 
-const { logger } = require("/opt/loggerLayer");
 const { decodeJWT, resolvePermissions } = require("/opt/permissionLayer");
-const { sendResponse } = require("/opt/responseLayer");
-const { TABLE_NAME, dynamodb } = require("/opt/dynamoLayer");
+const { TABLE_NAME, dynamodb, sendResponse, logger } = require("/opt/baseLayer");
 const crypto = require('crypto');
 
 const EXPORT_FUNCTION_NAME =

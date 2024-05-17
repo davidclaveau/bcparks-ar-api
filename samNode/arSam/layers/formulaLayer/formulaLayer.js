@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const { TABLE_NAME } = require("/opt/dynamoLayer");
+const { TABLE_NAME } = require("/opt/baseLayer");
 const { validActivities } = require("/opt/subAreaLayer");
 
 const gstPercent = 5;

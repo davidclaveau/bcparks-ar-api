@@ -1,12 +1,10 @@
-const { runQuery, TABLE_NAME } = require("/opt/dynamoLayer");
+const { runQuery, TABLE_NAME, sendResponse, logger } = require("/opt/baseLayer");
 const AWS = require("aws-sdk");
-const { sendResponse } = require("/opt/responseLayer");
 const {
   decodeJWT,
   roleFilter,
   resolvePermissions,
 } = require("/opt/permissionLayer");
-const { logger } = require("/opt/loggerLayer");
 
 exports.handler = async (event, context) => {
   logger.debug("Variance get:", event);

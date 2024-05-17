@@ -1,8 +1,6 @@
 const AWS = require('aws-sdk');
-const { dynamodb, runQuery, TABLE_NAME, getOne, FISCAL_YEAR_FINAL_MONTH, TIMEZONE } = require('/opt/dynamoLayer');
-const { sendResponse } = require('/opt/responseLayer');
+const { dynamodb, runQuery, TABLE_NAME, getOne, FISCAL_YEAR_FINAL_MONTH, TIMEZONE, sendResponse, logger } = require('/opt/baseLayer');
 const { decodeJWT, resolvePermissions } = require('/opt/permissionLayer');
-const { logger } = require('/opt/loggerLayer');
 const { DateTime } = require('luxon');
 const { calculateVariance } = require('/opt/varianceLayer');
 const { EXPORT_VARIANCE_CONFIG } = require('/opt/constantsLayer');

@@ -1,7 +1,5 @@
-const { dynamodb, TABLE_NAME } = require("/opt/dynamoLayer");
+const { dynamodb, TABLE_NAME, logger, sendResponse } = require("/opt/baseLayer");
 const { decodeJWT, resolvePermissions } = require("/opt/permissionLayer");
-const { logger } = require("/opt/loggerLayer");
-const { sendResponse } = require("/opt/responseLayer");
 
 exports.handler = async (event, context) => {
   logger.debug("Park POST:", event);

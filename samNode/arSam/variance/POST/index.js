@@ -1,4 +1,4 @@
-const { logger } = require("/opt/loggerLayer");
+const { logger } = require("/opt/baseLayer");
 
 exports.handler = async (event, context) => {
     logger.debug("Variance post:", event);

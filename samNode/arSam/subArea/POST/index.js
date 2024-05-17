@@ -2,12 +2,12 @@ const {
     dynamodb,
     incrementAndGetNextSubAreaID,
     getOne,
-  } = require("/opt/dynamoLayer");
+    logger,
+    sendResponse
+  } = require("/opt/baseLayer");
   const { createKeycloakRole } = require("/opt/keycloakLayer");
   const { createPutFormulaConfigObj } = require("/opt/formulaLayer");
-  const { sendResponse } = require("/opt/responseLayer");
   const { decodeJWT, resolvePermissions } = require("/opt/permissionLayer");
-  const { logger } = require("/opt/loggerLayer");
   const {
     getValidSubareaObj,
     createUpdateParkWithNewSubAreaObj,
@@ -50,6 +50,7 @@ const {
       }
   
       // Get park
+      console.log("GET ONE PARK")
       const park = await getOne("park", body.orcs);
       if (!park) {
         logger.debug("Unable to find park", body.orcs);
@@ -57,15 +58,18 @@ const {
       }
   
       // Create post obj
+      console.log("getvalidSubareaobj")
       let subAreaObj = getValidSubareaObj(body, park.parkName);
   
       // Generate subArea id
+      console.log("incrementandgetnextsubareaidTime")
       const subAreaId = await incrementAndGetNextSubAreaID();
   
       // Create transaction
       let transactionObj = { TransactItems: [] };
   
       // Update park
+      console.log("Updating park")
       transactionObj.TransactItems.push({
         Update: createUpdateParkWithNewSubAreaObj(
           subAreaObj.subAreaName,
@@ -76,6 +80,7 @@ const {
       });
   
       // Create subArea
+      console.log("Creating subarea")
       transactionObj.TransactItems.push({
         Put: createPutSubAreaObj(subAreaObj, subAreaId, park.parkName),
       });
@@ -92,7 +97,8 @@ const {
           Put: formulaObj,
         });
       }
-  
+       console.log("AT dynamodb transact")
+       console.log(dynamodb)
       const res = await dynamodb.transactWriteItems(transactionObj).promise();
       logger.debug("res:", res);
   

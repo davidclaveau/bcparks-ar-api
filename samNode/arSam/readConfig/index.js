@@ -1,6 +1,4 @@
-const { runQuery, TABLE_NAME } = require('/opt/dynamoLayer');
-const { sendResponse } = require('/opt/responseLayer');
-const { logger } = require('/opt/loggerLayer');
+const { runQuery, TABLE_NAME, sendResponse, logger } = require('/opt/baseLayer');
 
 exports.handler = async (event, context) => {
   logger.debug('Read Config', event);

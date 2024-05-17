@@ -1,11 +1,9 @@
-const { runQuery, TABLE_NAME } = require("/opt/dynamoLayer");
-const { sendResponse } = require("/opt/responseLayer");
+const { runQuery, TABLE_NAME, sendResponse, logger  } = require("/opt/baseLayer");
 const {
   decodeJWT,
   roleFilter,
   resolvePermissions,
 } = require("/opt/permissionLayer");
-const { logger } = require("/opt/loggerLayer");
 
 exports.handler = async (event, context) => {
   logger.info("GET: Park");

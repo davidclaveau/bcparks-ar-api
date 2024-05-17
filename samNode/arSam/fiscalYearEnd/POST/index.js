@@ -4,9 +4,9 @@ const {
   dynamodb,
   TIMEZONE,
   FISCAL_YEAR_FINAL_MONTH,
-} = require("/opt/dynamoLayer");
-const { sendResponse } = require("/opt/responseLayer");
-const { logger } = require("/opt/loggerLayer");
+  sendResponse,
+  logger
+} = require("/opt/baseLayer");
 const { decodeJWT, resolvePermissions } = require("/opt/permissionLayer");
 const { DateTime } = require("luxon");
 

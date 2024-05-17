@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const { dynamodb } = require("/opt/dynamoLayer");
+const { dynamodb } = require("/opt/baseLayer");
 const crypto = require("crypto");
 
 function convertRolesToMD5(roles, prefix = "") {
