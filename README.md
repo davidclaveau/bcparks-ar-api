@@ -106,6 +106,7 @@ arSam$ sam local invoke HelloWorldFunction --event events/event.json
 
 The SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path.
 
+
 ```yaml
       Events:
         HelloWorld:
